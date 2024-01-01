@@ -1,15 +1,18 @@
 #include<stdint.h>
 #include<iostream>
+#include<cctype>
 
 #include"globals.hpp"
 #include"Move.cpp"
 #include"Board.cpp"
+#include"Game.cpp"
 
-bitboard generate_position(char col, char row, bool white) {
+bitboard generate_position(char col_letter, char row_number, bool white) {
+  char col_number = col_letter - 97 + 1;
   if(white) {
-    return (bitboard) 1 << (8 - col) << (row - 1) * 8;
+    return (bitboard) 1 << (8 - col_number) << (row_number - 1) * 8;
   } else {
-    return (bitboard) 1 << (8 - col) << (8 - row) * 8;
+    return (bitboard) 1 << (8 - col_number) << (8 - row_number) * 8;
   }
 }
 
@@ -22,39 +25,24 @@ void print_bitboard(bitboard bb) {
   }
 }
 
-bitboard flip_bitboard(bitboard bb) {
-  return ( (bb << 56)                           ) |
-    ( (bb << 40) & bitboard(0x00ff000000000000) ) |
-    ( (bb << 24) & bitboard(0x0000ff0000000000) ) |
-    ( (bb <<  8) & bitboard(0x000000ff00000000) ) |
-    ( (bb >>  8) & bitboard(0x00000000ff000000) ) |
-    ( (bb >> 24) & bitboard(0x0000000000ff0000) ) |
-    ( (bb >> 40) & bitboard(0x000000000000ff00) ) |
-    ( (bb >> 56) );
-}
-
 int main(void) {
+  /*
   Board board(false);
-  board.print_board();
+  bool white_turn = true;
 
-  Move move_one(true,
-		generate_position(4, 2, true),
-		generate_position(4, 4, true),
-		PAWN,
-		NONE,
-		false);
-  board.execute_move(&move_one);
+  char start_row, start_col, end_row, end_col;
 
-  Move move_two(false,
-		generate_position(4, 7, false),
-		generate_position(4, 5, false),
-		PAWN,
-		NONE,
-		false);
-  board.execute_move(&move_two);
+  std::cout << "Start position (i.e. d2): ";
+  std::cin >> start_col >> start_row;
+  std::cout << "End position (i.e. d4): ";
+  std::cin >> end_col >> end_row;
 
-  board.print_board();
-	       
+  // get pieces at start and end position
+  // detect castle
+  */
 
+  Game game;
+  game.run_game();
+  
   return 0;
 }
