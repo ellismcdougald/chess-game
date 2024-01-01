@@ -46,7 +46,7 @@ void Board::print_board(void) {
     if(white_piece != NONE) {
       std::cout << " " << get_char_from_piece(white_piece) << " ";
     } else if(black_piece != NONE) {
-      std::cout << " " << get_char_from_piece(black_piece) << " ";
+      std::cout << " " << (char) tolower(get_char_from_piece(black_piece)) << " ";
     } else {
       std::cout << "   ";
     }
