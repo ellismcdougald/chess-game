@@ -9,6 +9,7 @@ public:
 
   // Getters:
   bitboard get_piece_positions(piece p, bool white);
+  piece get_piece_at_position(bitboard position, bool white);
 
   // Printers:
   void print_board(void);
@@ -33,7 +34,6 @@ private:
   void print_bitboard(bitboard bitboard);
 
   // Helpers
-  piece get_piece_at_position(bitboard position, bool white);
   piece get_piece_from_index(int piece_index);
   char get_char_from_piece(piece p);
   bitboard flip_bitboard(bitboard bb);

@@ -23,6 +23,16 @@ bitboard Board::get_piece_positions(piece piece, bool white) {
   }
 }
 
+piece Board::get_piece_at_position(bitboard position, bool white) {
+  bitboard *bb_ptr = white ? white_bitboards : black_bitboards;
+  for(int i = 0; i < 6; i++) {
+    if(bb_ptr[i] & position) {
+      return get_piece_from_index(i);
+    }
+  }
+  return NONE;
+}
+
 // Printers:
 void Board::print_board(void) {
   std::cout << "Board:\n";
@@ -133,16 +143,6 @@ void Board::print_bitboard(bitboard bb) {
 }
 
 // Helpers:
-piece Board::get_piece_at_position(bitboard position, bool white) {
-  bitboard *bb_ptr = white ? white_bitboards : black_bitboards;
-  for(int i = 0; i < 6; i++) {
-    if(bb_ptr[i] & position) {
-      return get_piece_from_index(i);
-    }
-  }
-  return NONE;
-}
-
 piece Board::get_piece_from_index(int piece_index) {
   switch(piece_index) {
   case 0: return PAWN;
