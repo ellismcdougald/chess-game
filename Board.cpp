@@ -24,6 +24,34 @@ bitboard Board::get_piece_positions(piece piece, bool white) {
 }
 
 // Printers:
+void Board::print_board(void) {
+  bitboard white_mask = (bitboard) 1 << 63;
+  bitboard black_mask = 1;
+  piece white_piece, black_piece;
+  
+  for(int i = 0; i < 64; i++) {
+    white_piece = get_piece_at_position(white_mask, true);
+    black_piece = get_piece_at_position(black_mask, false);
+
+    if(white_piece != NONE) {
+      std::cout << " " << get_char_from_piece(white_piece) << " ";
+    } else if(black_piece != NONE) {
+      std::cout << " " << get_char_from_piece(black_piece) << " ";
+    } else {
+      std::cout << "   ";
+    }
+
+    white_mask >>= 1;
+    black_mask <<= 1;
+
+    if((i + 1) % 8 == 0) {
+      std::cout << "\n";
+    } else {
+      std::cout << "|";
+    }
+  }
+}
+
 void Board::print_piece_positions(piece p, bool white) {
   if(white) {
     print_bitboard(white_bitboards[p]);
@@ -104,4 +132,39 @@ void Board::print_bitboard(bitboard bb) {
     mask >>= 1;
     if((i + 1) % 8 == 0) std::cout << "\n";
   }
+}
+
+// Helpers:
+piece Board::get_piece_at_position(bitboard position, bool white) {
+  bitboard *bb_ptr = white ? white_bitboards : black_bitboards;
+  for(int i = 0; i < 6; i++) {
+    if(bb_ptr[i] & position) {
+      return get_piece_from_index(i);
+    }
+  }
+  return NONE;
+}
+
+piece Board::get_piece_from_index(int piece_index) {
+  switch(piece_index) {
+  case 0: return PAWN;
+  case 1: return KNIGHT;
+  case 2: return BISHOP;
+  case 3: return ROOK;
+  case 4: return QUEEN;
+  case 5: return KING;
+  default: return NONE;
+  };
+}
+
+char Board::get_char_from_piece(piece p) {
+  switch(p) {
+  case PAWN: return 'P';
+  case KNIGHT: return 'N';
+  case BISHOP: return 'B';
+  case ROOK: return 'R';
+  case QUEEN: return 'Q';
+  case KING: return 'K';
+  default: return ' ';
+  };
 }

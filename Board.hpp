@@ -11,6 +11,7 @@ public:
   bitboard get_piece_positions(piece p, bool white);
 
   // Printers:
+  void print_board(void);
   void print_piece_positions(piece p, bool white);
 
   // Board management:
@@ -30,4 +31,9 @@ private:
 
   // Print
   void print_bitboard(bitboard bitboard);
+
+  // Helpers
+  piece get_piece_at_position(bitboard position, bool white);
+  piece get_piece_from_index(int piece_index);
+  char get_char_from_piece(piece p);
 };
