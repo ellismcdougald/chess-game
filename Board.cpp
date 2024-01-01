@@ -25,13 +25,13 @@ bitboard Board::get_piece_positions(piece piece, bool white) {
 
 // Printers:
 void Board::print_board(void) {
-  bitboard white_mask = (bitboard) 1 << 63;
-  bitboard black_mask = 1;
+  std::cout << "Board:\n";
+  bitboard mask = (bitboard) 1 << 63;
   piece white_piece, black_piece;
   
   for(int i = 0; i < 64; i++) {
-    white_piece = get_piece_at_position(white_mask, true);
-    black_piece = get_piece_at_position(black_mask, false);
+    white_piece = get_piece_at_position(mask, true);
+    black_piece = get_piece_at_position(flip_bitboard(mask), false);
 
     if(white_piece != NONE) {
       std::cout << " " << get_char_from_piece(white_piece) << " ";
@@ -41,8 +41,7 @@ void Board::print_board(void) {
       std::cout << "   ";
     }
 
-    white_mask >>= 1;
-    black_mask <<= 1;
+    mask >>= 1;
 
     if((i + 1) % 8 == 0) {
       std::cout << "\n";
@@ -108,7 +107,6 @@ void Board::undo_move(Move *move) {
 
 // Initializers
 void Board::initialize_starting_position(void) {
-  std::cout << "run\n";
   set_piece_position(KING_START_POSITION, KING, true);
   set_piece_position(QUEEN_START_POSITION, QUEEN, true);
   set_piece_position(BISHOP_START_POSITION, BISHOP, true);
@@ -167,4 +165,15 @@ char Board::get_char_from_piece(piece p) {
   case KING: return 'K';
   default: return ' ';
   };
+}
+
+bitboard Board::flip_bitboard(bitboard bb) {
+  return ( (bb << 56)                           ) |
+    ( (bb << 40) & bitboard(0x00ff000000000000) ) |
+    ( (bb << 24) & bitboard(0x0000ff0000000000) ) |
+    ( (bb <<  8) & bitboard(0x000000ff00000000) ) |
+    ( (bb >>  8) & bitboard(0x00000000ff000000) ) |
+    ( (bb >> 24) & bitboard(0x0000000000ff0000) ) |
+    ( (bb >> 40) & bitboard(0x000000000000ff00) ) |
+    ( (bb >> 56) );
 }
