@@ -7,7 +7,7 @@
 class Move {
 public:
   // Constructors:
-  Move(bool white, bitboard start_position, bitboard end_position, piece move_piece, piece capture_piece, bool castle);
+  Move(bool a_white, bitboard a_start_position, bitboard a_end_position, piece a_move_piece, piece a_capture_piece, bool a_castle);
 
   // Getters:
   bool get_white(void);

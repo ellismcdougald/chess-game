@@ -7,13 +7,13 @@
 #include"Move.hpp"
 
 // Constructors:
-Move::Move(bool white, bitboard start_position, bitboard end_position, piece move_piece, piece capture_piece, bool castle) {
-  white = white;
-  start_position = start_position;
-  end_position = end_position;
-  move_piece = move_piece;
-  capture_piece = capture_piece;
-  castle = castle;
+Move::Move(bool a_white, bitboard a_start_position, bitboard a_end_position, piece a_move_piece, piece a_capture_piece, bool a_castle) {
+  white = a_white;
+  start_position = a_start_position;
+  end_position = a_end_position;
+  move_piece = a_move_piece;
+  capture_piece = a_capture_piece;
+  castle = a_castle;
 }
 
 // Getters:
