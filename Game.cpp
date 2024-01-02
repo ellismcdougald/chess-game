@@ -77,3 +77,16 @@ void Game::print_bitboard(bitboard bb) {
     if((i + 1) % 8 == 0) std::cout << "\n";
   }
 }
+
+// Testing:
+void Game::test_move_generator(void) {
+  std::cout << "Testing move generator\n";
+
+  Move move(true, generate_position('d', 2, true), generate_position('d', 4, true), PAWN, NONE, false);
+  board.execute_move(&move);
+  Move move_1(true, generate_position('e', 2, true), generate_position('e', 4, true), PAWN, NONE, false);
+  board.execute_move(&move_1);
+  board.print_board();
+  
+  move_generator.generate_king_pseudo_legal_moves(&board, true);
+}

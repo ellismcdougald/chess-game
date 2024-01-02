@@ -1,10 +1,13 @@
 #include<stdint.h>
 #include<iostream>
 #include<cctype>
+#include<map>
 
 #include"globals.hpp"
 #include"Move.cpp"
 #include"Board.cpp"
+#include"LookupTables.cpp"
+#include"MoveGenerator.cpp"
 #include"Game.cpp"
 
 bitboard generate_position(char col_letter, char row_number, bool white) {
@@ -26,23 +29,10 @@ void print_bitboard(bitboard bb) {
 }
 
 int main(void) {
-  /*
-  Board board(false);
-  bool white_turn = true;
-
-  char start_row, start_col, end_row, end_col;
-
-  std::cout << "Start position (i.e. d2): ";
-  std::cin >> start_col >> start_row;
-  std::cout << "End position (i.e. d4): ";
-  std::cin >> end_col >> end_row;
-
-  // get pieces at start and end position
-  // detect castle
-  */
-
   Game game;
-  game.run_game();
+  //game.run_game();
+
+  game.test_move_generator();
   
   return 0;
 }

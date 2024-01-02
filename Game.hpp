@@ -14,9 +14,13 @@ public:
   // Printers:
   void print_board(void);
 
+  // Testing:
+  void test_move_generator(void);
+
 private:
   Board board;
   bool white_turn;
+  MoveGenerator move_generator;
 
   // Helpers:
   bitboard generate_position(char col_letter, char row_number, bool white);
