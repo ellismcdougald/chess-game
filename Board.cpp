@@ -23,6 +23,16 @@ bitboard Board::get_piece_positions(piece piece, bool white) {
   }
 }
 
+bitboard Board::get_all_piece_positions(bool white) {
+  if(white) {
+    return white_bitboards[PAWN] | white_bitboards[KNIGHT] | white_bitboards[BISHOP] |
+      white_bitboards[ROOK] | white_bitboards[QUEEN] | white_bitboards[KING];
+  } else {
+    return black_bitboards[PAWN] | black_bitboards[KNIGHT] | black_bitboards[BISHOP] |
+      black_bitboards[ROOK] | black_bitboards[QUEEN] | black_bitboards[KING];
+  }
+}
+
 piece Board::get_piece_at_position(bitboard position, bool white) {
   bitboard *bb_ptr = white ? white_bitboards : black_bitboards;
   for(int i = 0; i < 6; i++) {

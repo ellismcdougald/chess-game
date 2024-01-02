@@ -9,6 +9,7 @@ public:
 
   // Getters:
   bitboard get_piece_positions(piece p, bool white);
+  bitboard get_all_piece_positions(bool white);
   piece get_piece_at_position(bitboard position, bool white);
 
   // Printers:
