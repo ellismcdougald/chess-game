@@ -8,8 +8,6 @@
 
 MoveGenerator::MoveGenerator() {};
 
-extern void print_bitboard();
-
 // Pseudo-legal move generation:
 std::vector<Move> MoveGenerator::generate_king_pseudo_legal_moves(Board *board, bool white) {
   std::vector<Move> king_pseudo_legal_moves;
@@ -34,6 +32,20 @@ std::vector<Move> MoveGenerator::generate_king_pseudo_legal_moves(Board *board, 
   return king_pseudo_legal_moves;
 }
 
+// Sliding Piece Moves:
+bitboard MoveGenerator::generate_sliding_piece_moves(direction slide_direction, bitboard piece_position, bitboard other_piece_positions, bitboard opponent_piece_positions) {
+  opponent_piece_positions = move_direction(slide_direction, opponent_piece_positions);
+  
+  bitboard result = 0;
+  bitboard current_position = piece_position;
+  while(current_position) {
+    current_position = move_direction(slide_direction, current_position) & ~other_piece_positions & ~opponent_piece_positions;
+    result |= current_position;
+  } 
+  
+  return result;
+}
+
 // Print:
 void MoveGenerator::print_bitboard(bitboard bb) {
   bitboard mask = (bitboard) 1 << 63;
@@ -41,5 +53,19 @@ void MoveGenerator::print_bitboard(bitboard bb) {
     std::cout << (mask & bb ? 1 : 0);
     mask >>= 1;
     if((i + 1) % 8 == 0) std::cout << "\n";
+  }
+}
+
+// Helpers:
+bitboard  MoveGenerator::move_direction(direction move_direction, bitboard position) {
+  switch(move_direction) {
+  case NORTH: return NORTH(position);
+  case SOUTH: return SOUTH(position);
+  case EAST: return EAST(position);
+  case WEST: return WEST(position);
+  case NORTHWEST: return NORTHWEST(position);
+  case NORTHEAST: return NORTHEAST(position);
+  case SOUTHWEST: return SOUTHWEST(position);
+  case SOUTHEAST: return SOUTHEAST(position);
   }
 }
