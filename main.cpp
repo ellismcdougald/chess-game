@@ -29,10 +29,20 @@ void print_bitboard(bitboard bb) {
 }
 
 int main(void) {
-  Game game;
+  //Game game;
   //game.run_game();
 
-  game.test_move_generator();
+  //game.test_move_generator();
+
+  Board board(false);
+  //board.set_piece_position(1, ROOK, true);
+  //board.set_piece_position(8, KING, true);
+  //board.set_piece_position(0x80, ROOK, true);
   
+  MoveGenerator move_gen;
+
+  bitboard white_threat_table = move_gen.generate_threat_table(&board, true, true);
+  print_bitboard(white_threat_table);
+
   return 0;
 }
