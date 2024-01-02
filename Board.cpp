@@ -125,7 +125,19 @@ void Board::undo_move(Move *move) {
   }
 }
 
-// Initializers
+// Helpers:
+bitboard Board::flip_bitboard(bitboard bb) {
+  return ( (bb << 56)                           ) |
+    ( (bb << 40) & bitboard(0x00ff000000000000) ) |
+    ( (bb << 24) & bitboard(0x0000ff0000000000) ) |
+    ( (bb <<  8) & bitboard(0x000000ff00000000) ) |
+    ( (bb >>  8) & bitboard(0x00000000ff000000) ) |
+    ( (bb >> 24) & bitboard(0x0000000000ff0000) ) |
+    ( (bb >> 40) & bitboard(0x000000000000ff00) ) |
+    ( (bb >> 56) );
+}
+
+// Initializers:
 void Board::initialize_starting_position(void) {
   set_piece_position(KING_START_POSITION, KING, true);
   set_piece_position(QUEEN_START_POSITION, QUEEN, true);
@@ -175,15 +187,4 @@ char Board::get_char_from_piece(piece p) {
   case KING: return 'K';
   default: return ' ';
   };
-}
-
-bitboard Board::flip_bitboard(bitboard bb) {
-  return ( (bb << 56)                           ) |
-    ( (bb << 40) & bitboard(0x00ff000000000000) ) |
-    ( (bb << 24) & bitboard(0x0000ff0000000000) ) |
-    ( (bb <<  8) & bitboard(0x000000ff00000000) ) |
-    ( (bb >>  8) & bitboard(0x00000000ff000000) ) |
-    ( (bb >> 24) & bitboard(0x0000000000ff0000) ) |
-    ( (bb >> 40) & bitboard(0x000000000000ff00) ) |
-    ( (bb >> 56) );
 }

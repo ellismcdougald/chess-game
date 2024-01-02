@@ -2,6 +2,8 @@
  * Board class.
  */
 
+#pragma once
+
 class Board {
 public:
   // Constructors:
@@ -23,6 +25,9 @@ public:
   // Moves:
   void execute_move(Move *move);
   void undo_move(Move *move);
+
+  // Helpers:
+  bitboard flip_bitboard(bitboard bb);
   
 private:
   bitboard white_bitboards[6];
@@ -37,5 +42,4 @@ private:
   // Helpers
   piece get_piece_from_index(int piece_index);
   char get_char_from_piece(piece p);
-  bitboard flip_bitboard(bitboard bb);
 };
