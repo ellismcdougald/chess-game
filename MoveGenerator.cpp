@@ -100,6 +100,28 @@ bitboard MoveGenerator::get_threats_by_piece(piece piece, Board *board, bitboard
   }
 }
 
+bitboard MoveGenerator::get_attackers_to_position(Board *board, bitboard position, bool white) {
+  bitboard attackers;
+  bitboard king_attackers = lookup_tables.get_king_move_bitboard(position) & board->get_piece_positions(KING, white);
+  bitboard pawn_attackers = (SOUTHWEST(position) | SOUTHEAST(position)) & board->get_piece_positions(PAWN, white);
+  bitboard knight_attackers = lookup_tables.get_knight_move_bitboard(position) & board->get_piece_positions(KNIGHT, white);
+
+  bitboard other_piece_positions = board->get_all_piece_positions(white) & ~position;
+  bitboard opponent_piece_positions = board->flip_bitboard(board->get_all_piece_positions(!white));
+  
+  bitboard bishop_attackers = generate_bishop_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(BISHOP, white));
+  bitboard rook_attackers = generate_rook_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(ROOK, white));
+  bitboard queen_attackers = generate_queen_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(QUEEN, white));
+
+  return pawn_attackers | knight_attackers | king_attackers | bishop_attackers | rook_attackers | queen_attackers;
+}
+
+// Check:
+bool MoveGenerator::is_checked(Board* board, bool white) {
+  bitboard king_position = board->get_piece_positions(KING, white);
+  return get_attackers_to_position(board, king_position, !white);
+}
+
 // Print:
 void MoveGenerator::print_bitboard(bitboard bb) {
   bitboard mask = (bitboard) 1 << 63;

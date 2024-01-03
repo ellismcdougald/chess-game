@@ -16,8 +16,9 @@ public:
   std::vector<Move> generate_knight_pseudo_legal_moves(Board* board, bool white); // TODO
   std::vector<Move> generate_pawn_pseudo_legal_moves(Board* board, bool white); // TODO
 
-  // Castling:
+  // King Moves:
   std::vector<Move> generate_castle_moves(); // TODO
+  std::vector<Move> generate_evasion_moves(Board* board, bool white); // TODO
 
   // Legal moves:
   std::vector<Move> generate_legal_moves(); // TODO
@@ -31,6 +32,10 @@ public:
   // Threat Tables:
   bitboard generate_threat_table(Board *board, bool white, bool exclude_king); // TODO
   bitboard get_threats_by_piece(piece piece, Board *board, bitboard position, bool white, bool exclude_king);
+  bitboard get_attackers_to_position(Board *board, bitboard position, bool white);
+
+  // Check:
+  bool is_checked(Board* board, bool white);
 
 private:
   LookupTables lookup_tables;

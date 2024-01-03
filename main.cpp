@@ -2,6 +2,7 @@
 #include<iostream>
 #include<cctype>
 #include<map>
+#include<array>
 
 #include"globals.hpp"
 #include"Move.cpp"
@@ -34,15 +35,19 @@ int main(void) {
 
   //game.test_move_generator();
 
-  Board board(false);
-  //board.set_piece_position(1, ROOK, true);
-  //board.set_piece_position(8, KING, true);
-  //board.set_piece_position(0x80, ROOK, true);
+  //Game game;
+  //std::cout << game.is_checked(true) << "\n";
+
+  Board board(true);
+  board.set_piece_position(1, KING, true);
+  board.set_piece_position(2, QUEEN, false);
+  board.print_board();
   
   MoveGenerator move_gen;
+  //bitboard attackers = move_gen.get_attackers_to_position(&board, 1, false);
+  //print_bitboard(attackers);
 
-  bitboard white_threat_table = move_gen.generate_threat_table(&board, true, true);
-  print_bitboard(white_threat_table);
+  std::cout << move_gen.is_checked(&board, true) << "\n";
 
   return 0;
 }
