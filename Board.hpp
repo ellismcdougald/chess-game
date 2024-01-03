@@ -28,6 +28,7 @@ public:
 
   // Helpers:
   bitboard flip_bitboard(bitboard bb);
+  piece get_piece_from_index(int piece_index);
   
 private:
   bitboard white_bitboards[6];
@@ -40,6 +41,5 @@ private:
   void print_bitboard(bitboard bitboard);
 
   // Helpers
-  piece get_piece_from_index(int piece_index);
   char get_char_from_piece(piece p);
 };

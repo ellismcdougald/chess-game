@@ -137,6 +137,18 @@ bitboard Board::flip_bitboard(bitboard bb) {
     ( (bb >> 56) );
 }
 
+piece Board::get_piece_from_index(int piece_index) {
+  switch(piece_index) {
+  case 0: return PAWN;
+  case 1: return KNIGHT;
+  case 2: return BISHOP;
+  case 3: return ROOK;
+  case 4: return QUEEN;
+  case 5: return KING;
+  default: return NONE;
+  };
+}
+
 // Initializers:
 void Board::initialize_starting_position(void) {
   set_piece_position(KING_START_POSITION, KING, true);
@@ -165,18 +177,6 @@ void Board::print_bitboard(bitboard bb) {
 }
 
 // Helpers:
-piece Board::get_piece_from_index(int piece_index) {
-  switch(piece_index) {
-  case 0: return PAWN;
-  case 1: return KNIGHT;
-  case 2: return BISHOP;
-  case 3: return ROOK;
-  case 4: return QUEEN;
-  case 5: return KING;
-  default: return NONE;
-  };
-}
-
 char Board::get_char_from_piece(piece p) {
   switch(p) {
   case PAWN: return 'P';
