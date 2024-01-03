@@ -41,16 +41,17 @@ int main(void) {
   Board board(true);
   board.set_piece_position(1, KING, true);
   board.set_piece_position(1, QUEEN, false);
+  board.set_piece_position(0x80, QUEEN, true);
+  board.set_piece_position(0x8000000000000000, QUEEN, true);
   board.print_board();
   
   MoveGenerator move_gen;
   //bitboard attackers = move_gen.get_attackers_to_position(&board, 1, false);
   //print_bitboard(attackers);
 
-  std::cout << move_gen.is_checked(&board, true) << "\n";
-
   //move_gen.generate_evasion_moves(&board, true);
   move_gen.generate_evasion_moves(&board, true);
+
 
   return 0;
 }

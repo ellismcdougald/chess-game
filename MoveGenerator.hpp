@@ -25,9 +25,16 @@ public:
 
   // Sliding Piece Moves
   bitboard generate_sliding_piece_move_table(direction slide_direction, bitboard piece_position, bitboard other_piece_positions, bitboard opponent_piece_positions);
+  
+
+  // Move tables:
+  bitboard generate_king_move_table(bitboard king_position, bitboard other_piece_positions);
+  bitboard generate_pawn_move_table(bitboard pawn_position, bitboard other_piece_positions, bitboard opponent_piece_positions);
+  bitboard generate_knight_move_table(bitboard knight_position, bitboard other_piece_positions);
   bitboard generate_queen_move_table(bitboard queen_position, bitboard other_piece_positions, bitboard opponent_piece_positions);
   bitboard generate_rook_move_table(bitboard rook_position, bitboard other_piece_positions, bitboard opponent_piece_positions);
   bitboard generate_bishop_move_table(bitboard bishop_position, bitboard other_piece_positions, bitboard opponent_piece_positions);
+  bitboard get_move_table_by_piece(piece move_piece, bitboard position, bitboard other_piece_positions, bitboard opponent_piece_positions);
 
   // Threat Tables:
   bitboard generate_threat_table(Board *board, bool white, bool exclude_king); // TODO
@@ -46,5 +53,7 @@ private:
 
   // Helpers:
   bitboard move_direction(direction move_direction, bitboard position);
+  int count_attackers(std::array<bitboard, 6> attackers_by_position);
+  int count_bits(bitboard bb);
 
 };

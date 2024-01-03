@@ -33,9 +33,45 @@ std::vector<Move> MoveGenerator::generate_king_pseudo_legal_moves(Board *board, 
 // King Moves:
 std::vector<Move> MoveGenerator::generate_evasion_moves(Board* board, bool white) {
   std::vector<Move> evasion_moves;
-  
+
   bitboard king_position = board->get_piece_positions(KING, white);
   std::array<bitboard, 6> king_attackers_by_piece = get_attackers_to_position_by_piece(board, king_position, !white);
+  bitboard king_attacker_locations = get_attackers_to_position(board, king_position, !white);
+  int num_attackers = count_attackers(king_attackers_by_piece);
+  bitboard threatened_squares = board->flip_bitboard(generate_threat_table(board, !white, true));
+
+  // king moves
+  bitboard king_moves = lookup_tables.get_king_move_bitboard(king_position) & ~threatened_squares;
+  print_bitboard(king_moves);
+
+  bitboard other_piece_positions = board->get_all_piece_positions(white);
+  bitboard opponent_piece_positions = board->get_all_piece_positions(!white);
+
+  // if more than one, only king moves
+  // else we consider captures or blocks
+
+  // capture moves
+  bitboard piece_positions, piece_move_bitboard, current_position;
+  piece piece_type, attacker_piece_type;
+  for(int piece_index = 0; piece_index < 6; piece_index++) {
+    piece_type = board->get_piece_from_index(piece_index);
+    piece_positions = board->get_piece_positions(piece_type, white);
+    for(bitboard position_mask = 1; position_mask > 0; position_mask <<= 1) {
+      current_position = piece_positions & position_mask;
+      if(current_position) {
+	piece_move_bitboard = get_move_table_by_piece(piece_type, current_position, other_piece_positions & ~current_position, opponent_piece_positions);
+	for(int attacker_piece_index = 0; attacker_piece_index < 6; attacker_piece_index++ ) {
+	  attacker_piece_type = board->get_piece_from_index(attacker_piece_index);
+	  if(piece_move_bitboard & king_attackers_by_piece[attacker_piece_index]) {
+	    Move move(white, current_position, piece_move_bitboard & king_attackers_by_piece[attacker_piece_index], piece_type, attacker_piece_type, false);
+	    evasion_moves.push_back(move);
+	  }
+	}
+      }
+    }
+  }
+
+  std::cout << evasion_moves.size() << "\n";
 
   // Two attackers
   // capture or move to safe square
@@ -62,6 +98,19 @@ bitboard MoveGenerator::generate_sliding_piece_move_table(direction slide_direct
   return result;
 }
 
+// Move Tables:
+bitboard MoveGenerator::generate_king_move_table(bitboard king_position, bitboard other_piece_positions) {
+  return lookup_tables.get_king_move_bitboard(king_position) & ~other_piece_positions;
+}
+bitboard MoveGenerator::generate_pawn_move_table(bitboard pawn_position, bitboard other_piece_positions, bitboard opponent_piece_positions) {
+  return (lookup_tables.get_pawn_single_push_bitboard(pawn_position) & ~other_piece_positions) |
+    (lookup_tables.get_pawn_double_push_bitboard(pawn_position) & ~other_piece_positions &~opponent_piece_positions) |
+    (lookup_tables.get_pawn_attack_bitboard(pawn_position) & opponent_piece_positions);
+}
+bitboard MoveGenerator::generate_knight_move_table(bitboard knight_position, bitboard other_piece_positions) {
+  return lookup_tables.get_knight_move_bitboard(knight_position) & ~other_piece_positions;
+}
+
 bitboard MoveGenerator::generate_queen_move_table(bitboard queen_position, bitboard other_piece_positions, bitboard opponent_piece_positions) {
   return generate_sliding_piece_move_table(NORTH, queen_position, other_piece_positions, opponent_piece_positions) |
     generate_sliding_piece_move_table(SOUTH, queen_position, other_piece_positions, opponent_piece_positions) |
@@ -85,6 +134,18 @@ bitboard MoveGenerator::generate_bishop_move_table(bitboard bishop_position, bit
     generate_sliding_piece_move_table(NORTHEAST, bishop_position, other_piece_positions, opponent_piece_positions) |
     generate_sliding_piece_move_table(SOUTHWEST, bishop_position, other_piece_positions, opponent_piece_positions) |
     generate_sliding_piece_move_table(SOUTHEAST, bishop_position, other_piece_positions, opponent_piece_positions);
+}
+
+bitboard MoveGenerator::get_move_table_by_piece(piece move_piece, bitboard position, bitboard other_piece_positions, bitboard opponent_piece_positions) {
+  switch(move_piece) {
+  case PAWN: return generate_pawn_move_table(position, other_piece_positions, opponent_piece_positions);
+  case KNIGHT: return generate_knight_move_table(position, other_piece_positions);
+  case BISHOP: return generate_bishop_move_table(position, other_piece_positions, opponent_piece_positions);
+  case ROOK: return generate_rook_move_table(position, other_piece_positions, opponent_piece_positions);
+  case QUEEN: return generate_queen_move_table(position, other_piece_positions, opponent_piece_positions);
+  case KING: return generate_king_move_table(position, other_piece_positions);
+  case NONE: return 0;
+  }
 }
 
 // Threat Tables:
@@ -141,7 +202,7 @@ std::array<bitboard, 6> MoveGenerator::get_attackers_to_position_by_piece(Board 
   bitboard other_piece_positions = board->get_all_piece_positions(white) & ~position;
   bitboard opponent_piece_positions = board->flip_bitboard(board->get_all_piece_positions(!white));
   
-  attackers_by_piece[KNIGHT] = generate_bishop_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(BISHOP, white));
+  attackers_by_piece[BISHOP] = generate_bishop_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(BISHOP, white));
   attackers_by_piece[ROOK] = generate_rook_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(ROOK, white));
   attackers_by_piece[QUEEN] = generate_queen_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(QUEEN, white));
 
@@ -176,4 +237,22 @@ bitboard MoveGenerator::move_direction(direction move_direction, bitboard positi
   case SOUTHWEST: return SOUTHWEST(position);
   case SOUTHEAST: return SOUTHEAST(position);
   }
+}
+
+int MoveGenerator::count_attackers(std::array<bitboard, 6> attackers_by_position) {
+  int attacker_count = 0;
+  for(int position_index = 0; position_index < 6; position_index++) {
+    attacker_count += count_bits(attackers_by_position[position_index]);
+  }
+  return attacker_count;
+}
+
+int MoveGenerator::count_bits(bitboard bb) {
+  int bit_count = 0;
+  for(bitboard position = 1; position > 0; position <<= 1) {
+    if(bb & position) {
+      bit_count++;
+    }
+  }
+  return bit_count;
 }
