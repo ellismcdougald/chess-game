@@ -33,6 +33,7 @@ public:
   bitboard generate_threat_table(Board *board, bool white, bool exclude_king); // TODO
   bitboard get_threats_by_piece(piece piece, Board *board, bitboard position, bool white, bool exclude_king);
   bitboard get_attackers_to_position(Board *board, bitboard position, bool white);
+  std::array<bitboard, 6> get_attackers_to_position_by_piece(Board *board, bitboard position, bool white);
 
   // Check:
   bool is_checked(Board* board, bool white);

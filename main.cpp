@@ -40,7 +40,7 @@ int main(void) {
 
   Board board(true);
   board.set_piece_position(1, KING, true);
-  board.set_piece_position(2, QUEEN, false);
+  board.set_piece_position(1, QUEEN, false);
   board.print_board();
   
   MoveGenerator move_gen;
@@ -48,6 +48,9 @@ int main(void) {
   //print_bitboard(attackers);
 
   std::cout << move_gen.is_checked(&board, true) << "\n";
+
+  //move_gen.generate_evasion_moves(&board, true);
+  move_gen.generate_evasion_moves(&board, true);
 
   return 0;
 }

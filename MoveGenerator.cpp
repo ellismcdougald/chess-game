@@ -30,6 +30,23 @@ std::vector<Move> MoveGenerator::generate_king_pseudo_legal_moves(Board *board, 
   return king_pseudo_legal_moves;
 }
 
+// King Moves:
+std::vector<Move> MoveGenerator::generate_evasion_moves(Board* board, bool white) {
+  std::vector<Move> evasion_moves;
+  
+  bitboard king_position = board->get_piece_positions(KING, white);
+  std::array<bitboard, 6> king_attackers_by_piece = get_attackers_to_position_by_piece(board, king_position, !white);
+
+  // Two attackers
+  // capture or move to safe square
+  // One attacker
+  // capture, move to safe square, block sliding attack
+
+  
+
+  return evasion_moves;
+}
+
 // Sliding Piece Moves:
 bitboard MoveGenerator::generate_sliding_piece_move_table(direction slide_direction, bitboard piece_position, bitboard other_piece_positions, bitboard opponent_piece_positions) {
   other_piece_positions = move_direction(slide_direction, other_piece_positions);
@@ -101,7 +118,6 @@ bitboard MoveGenerator::get_threats_by_piece(piece piece, Board *board, bitboard
 }
 
 bitboard MoveGenerator::get_attackers_to_position(Board *board, bitboard position, bool white) {
-  bitboard attackers;
   bitboard king_attackers = lookup_tables.get_king_move_bitboard(position) & board->get_piece_positions(KING, white);
   bitboard pawn_attackers = (SOUTHWEST(position) | SOUTHEAST(position)) & board->get_piece_positions(PAWN, white);
   bitboard knight_attackers = lookup_tables.get_knight_move_bitboard(position) & board->get_piece_positions(KNIGHT, white);
@@ -114,6 +130,22 @@ bitboard MoveGenerator::get_attackers_to_position(Board *board, bitboard positio
   bitboard queen_attackers = generate_queen_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(QUEEN, white));
 
   return pawn_attackers | knight_attackers | king_attackers | bishop_attackers | rook_attackers | queen_attackers;
+}
+
+std::array<bitboard, 6> MoveGenerator::get_attackers_to_position_by_piece(Board *board, bitboard position, bool white) {
+  std::array<bitboard, 6> attackers_by_piece;
+  attackers_by_piece[KING] = lookup_tables.get_king_move_bitboard(position) & board->get_piece_positions(KING, white);
+  attackers_by_piece[PAWN] = (SOUTHWEST(position) | SOUTHEAST(position)) & board->get_piece_positions(PAWN, white);
+  attackers_by_piece[KNIGHT] = lookup_tables.get_knight_move_bitboard(position) & board->get_piece_positions(KNIGHT, white);
+
+  bitboard other_piece_positions = board->get_all_piece_positions(white) & ~position;
+  bitboard opponent_piece_positions = board->flip_bitboard(board->get_all_piece_positions(!white));
+  
+  attackers_by_piece[KNIGHT] = generate_bishop_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(BISHOP, white));
+  attackers_by_piece[ROOK] = generate_rook_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(ROOK, white));
+  attackers_by_piece[QUEEN] = generate_queen_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(QUEEN, white));
+
+  return attackers_by_piece;
 }
 
 // Check:
