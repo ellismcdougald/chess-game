@@ -22,18 +22,21 @@ bool MoveGenerator::is_move_legal(Move* move, Board* board) {
 
 std::vector<Move> MoveGenerator::generate_legal_moves(Board* board, bool white) {
   std::vector<Move> legal_moves;
-  std::vector<Move> pseudo_legal_moves;
-  std::vector<Move> king_pseudo_legal_moves = generate_king_pseudo_legal_moves(board, white);
+  std::vector<Move> piece_pseudo_legal_moves[6];
+  piece_pseudo_legal_moves[KING] = generate_piece_pseudo_legal_moves(board, white, KING);
+  piece_pseudo_legal_moves[QUEEN] = generate_piece_pseudo_legal_moves(board, white, QUEEN);
+  piece_pseudo_legal_moves[ROOK] = generate_piece_pseudo_legal_moves(board, white, ROOK);
+  piece_pseudo_legal_moves[BISHOP] = generate_piece_pseudo_legal_moves(board, white, BISHOP);
+  piece_pseudo_legal_moves[KNIGHT] = generate_piece_pseudo_legal_moves(board, white, KNIGHT);
+  piece_pseudo_legal_moves[PAWN] = generate_piece_pseudo_legal_moves(board, white, PAWN);
 
-  pseudo_legal_moves.insert(legal_moves.end(), king_pseudo_legal_moves.begin(), king_pseudo_legal_moves.end());
-
-  for(int i = 0; i < pseudo_legal_moves.size(); i++) {
-    if(is_move_legal(&pseudo_legal_moves[i], board)) {
-      legal_moves.push_back(pseudo_legal_moves[i]);
+  for(int piece_index = 0; piece_index < 6; piece_index++) {
+    for(int i = 0; i < piece_pseudo_legal_moves[piece_index].size(); i++) {
+      if(is_move_legal(&piece_pseudo_legal_moves[piece_index][i], board)) {
+	legal_moves.push_back(piece_pseudo_legal_moves[piece_index][i]);
+      }
     }
   }
-
-    
 		
   return legal_moves;
 }
@@ -58,6 +61,32 @@ std::vector<Move> MoveGenerator::generate_king_pseudo_legal_moves(Board *board, 
   }
 
   return king_pseudo_legal_moves;
+}
+
+std::vector<Move> MoveGenerator::generate_piece_pseudo_legal_moves(Board* board, bool white, piece move_piece) {
+  std::vector<Move> piece_pseudo_legal_moves;
+
+  bitboard piece_positions = board->get_piece_positions(move_piece, white);
+  bitboard other_piece_positions = board->get_all_piece_positions(white) & ~piece_positions;
+  bitboard opponent_piece_positions = board->flip_bitboard(board->get_all_piece_positions(!white));
+
+  bitboard move_table;
+  piece capture_piece;
+  // outer loop finds piece positions
+  for(bitboard piece_position_mask = 1; piece_position_mask > 0; piece_position_mask <<= 1) {
+    if(piece_positions & piece_position_mask) {
+      move_table = get_move_table_by_piece(move_piece, piece_position_mask, other_piece_positions, opponent_piece_positions);
+      for(bitboard move_mask = 1; move_mask > 0; move_mask <<= 1) {
+	if(move_table & move_mask) {
+	  capture_piece = board->get_piece_at_position(move_mask, !white);
+	  Move move(white, piece_position_mask, move_mask, move_piece, capture_piece, false);
+	  piece_pseudo_legal_moves.push_back(move);
+	}
+      }
+    }
+  }
+
+  return piece_pseudo_legal_moves;
 }
 
 // King Moves:
@@ -118,7 +147,7 @@ std::vector<Move> MoveGenerator::generate_evasion_moves(Board* board, bool white
 
 // Sliding Piece Moves:
 bitboard MoveGenerator::generate_sliding_piece_move_table(direction slide_direction, bitboard piece_position, bitboard other_piece_positions, bitboard opponent_piece_positions) {
-  other_piece_positions = move_direction(slide_direction, other_piece_positions);
+  //other_piece_positions = move_direction(slide_direction, other_piece_positions);
   opponent_piece_positions = move_direction(slide_direction, opponent_piece_positions);
 
   bitboard result = 0;

@@ -13,6 +13,8 @@ public:
   std::vector<Move> generate_legal_moves(Board* board, bool white); // TODO
 
   // Pseudo-legal move generation:
+  std::vector<Move> generate_piece_pseudo_legal_moves(Board* board, bool white, piece move_piece);
+  
   std::vector<Move> generate_king_pseudo_legal_moves(Board* board, bool white);
   std::vector<Move> generate_queen_pseudo_legal_moves(Board* board, bool white); // TODO
   std::vector<Move> generate_rook_pseudo_legal_moves(Board* board, bool white); // TODO
