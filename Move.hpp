@@ -20,6 +20,9 @@ public:
   // Printers:
   void print_move(void);
 
+  // Equality:
+  bool move_equals(Move* other_move);
+
 private:
   bool white;
   bitboard start_position;

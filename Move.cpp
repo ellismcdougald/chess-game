@@ -66,3 +66,12 @@ std::array<int, 2> Move::get_row_col_from_position(bitboard position) {
   return row_and_col;
 }
 
+// Equality:
+bool Move::move_equals(Move* other_move) {
+  return white == other_move->get_white() &&
+    start_position == other_move->get_start_position() &&
+    end_position == other_move->get_end_position() &&
+    move_piece == other_move->get_move_piece() &&
+    capture_piece == other_move->get_capture_piece() &&
+    castle == other_move->is_castle();
+}
