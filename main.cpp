@@ -30,8 +30,18 @@ void print_bitboard(bitboard bb) {
 }
 
 int main(void) {
-  //Game game;
-  //game.run_game();
+
+  
+  
+  Game game;
+  game.run_game();
+
+  return 0;
+
+  
+
+  
+   
 
   //game.test_move_generator();
 
@@ -41,20 +51,30 @@ int main(void) {
   //std::array<int, 2> row_and_col = get_row_col_from_position(1);
   //std::cout << "row " << row_and_col[0] << " col " << row_and_col[1] << "\n";
 
-  Board board(true);
-  board.set_piece_position(0x100, KING, true);
-  board.set_piece_position(1, QUEEN, false);
-  board.print_board();
-
+  Board board(false);
   MoveGenerator move_gen;
 
-  //move_gen.generate_evasion_moves(&board, true);
-  //move_gen.generate_evasion_moves(&board, true);
-
-  std::vector<Move> legal_moves = move_gen.generate_legal_moves(&board, true);
-  for(int i = 0; i < legal_moves.size(); i++) {
-    legal_moves[i].print_move();
+  std::vector<Move> white_bishop_pl_moves = move_gen.generate_piece_pseudo_legal_moves(&board, true, BISHOP);
+  for(int i = 0; i < white_bishop_pl_moves.size(); i++) {
+    white_bishop_pl_moves[i].print_move();
   }
+
+  return 0;
+
+  /*
+  std::vector<Move> black_pawn_pl_moves = move_gen.generate_piece_pseudo_legal_moves(&board, false, PAWN);
+  for(int i = 0; i < black_pawn_pl_moves.size(); i++) {
+    black_pawn_pl_moves[i].print_move();
+  }
+  */
+  
+  
+  std::vector<Move> black_legal_moves = move_gen.generate_legal_moves(&board, false);
+  for(int i = 0; i < black_legal_moves.size(); i++) {
+    black_legal_moves[i].print_move();
+  }
+  
+
 
 
   return 0;
