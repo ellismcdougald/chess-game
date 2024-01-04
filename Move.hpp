@@ -17,6 +17,9 @@ public:
   piece get_capture_piece(void);
   bool is_castle(void);
 
+  // Printers:
+  void print_move(void);
+
 private:
   bool white;
   bitboard start_position;
@@ -24,4 +27,7 @@ private:
   piece move_piece;
   piece capture_piece;
   bool castle;
+
+  // Helpers:
+  std::array<int, 2> get_row_col_from_position(bitboard position);
 };

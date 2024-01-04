@@ -40,3 +40,29 @@ piece Move::get_capture_piece(void) {
 bool Move::is_castle(void) {
   return castle;
 }
+
+// Printers:
+void Move::print_move(void) {
+  std::array<int, 2> start_row_col = get_row_col_from_position(start_position);
+  std::array<int, 2> end_row_col = get_row_col_from_position(end_position);
+
+  std::cout << (char) (start_row_col[1] + 65 - 1) << start_row_col[0] << "->" << (char) (end_row_col[1] + 65 - 1) << end_row_col[0] << "\n";
+}
+
+// Helpers:
+std::array<int, 2> Move::get_row_col_from_position(bitboard position) {
+  std::array<int, 2> row_and_col;
+  bitboard mask = 1;
+  int i;
+  for(i = 0; i < 64; i++) {
+    if(position & mask) {
+      break;
+    }
+    mask <<= 1;
+  }
+  row_and_col[0] = 1 + (i / 8);
+  row_and_col[1] = 8 - (i % 8);
+
+  return row_and_col;
+}
+
