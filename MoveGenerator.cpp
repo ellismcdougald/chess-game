@@ -8,6 +8,36 @@
 
 MoveGenerator::MoveGenerator() {};
 
+// Legal moves:
+bool MoveGenerator::is_move_legal(Move* move, Board* board) {
+  /*
+   * Executes move, then checks if king is in check, then undoes move.
+   */
+  board->execute_move(move);
+  bool is_check = is_checked(board, move->get_white());
+  board->undo_move(move);
+
+  return !is_check;
+}
+
+std::vector<Move> MoveGenerator::generate_legal_moves(Board* board, bool white) {
+  std::vector<Move> legal_moves;
+  std::vector<Move> pseudo_legal_moves;
+  std::vector<Move> king_pseudo_legal_moves = generate_king_pseudo_legal_moves(board, white);
+
+  pseudo_legal_moves.insert(legal_moves.end(), king_pseudo_legal_moves.begin(), king_pseudo_legal_moves.end());
+
+  for(int i = 0; i < pseudo_legal_moves.size(); i++) {
+    if(is_move_legal(&pseudo_legal_moves[i], board)) {
+      legal_moves.push_back(pseudo_legal_moves[i]);
+    }
+  }
+
+    
+		
+  return legal_moves;
+}
+
 // Pseudo-legal move generation:
 std::vector<Move> MoveGenerator::generate_king_pseudo_legal_moves(Board *board, bool white) {
   std::vector<Move> king_pseudo_legal_moves;
@@ -31,6 +61,7 @@ std::vector<Move> MoveGenerator::generate_king_pseudo_legal_moves(Board *board, 
 }
 
 // King Moves:
+// IN PROGRESS
 std::vector<Move> MoveGenerator::generate_evasion_moves(Board* board, bool white) {
   std::vector<Move> evasion_moves;
 
@@ -51,11 +82,13 @@ std::vector<Move> MoveGenerator::generate_evasion_moves(Board* board, bool white
   // else we consider captures or blocks
 
   // capture moves
-  bitboard piece_positions, piece_move_bitboard, current_position;
+  bitboard piece_positions, piece_move_bitboard, current_position, attack_ray;
   piece piece_type, attacker_piece_type;
   for(int piece_index = 0; piece_index < 6; piece_index++) {
     piece_type = board->get_piece_from_index(piece_index);
     piece_positions = board->get_piece_positions(piece_type, white);
+
+
     for(bitboard position_mask = 1; position_mask > 0; position_mask <<= 1) {
       current_position = piece_positions & position_mask;
       if(current_position) {
@@ -183,8 +216,8 @@ bitboard MoveGenerator::get_attackers_to_position(Board *board, bitboard positio
   bitboard pawn_attackers = (SOUTHWEST(position) | SOUTHEAST(position)) & board->get_piece_positions(PAWN, white);
   bitboard knight_attackers = lookup_tables.get_knight_move_bitboard(position) & board->get_piece_positions(KNIGHT, white);
 
-  bitboard other_piece_positions = board->get_all_piece_positions(white) & ~position;
-  bitboard opponent_piece_positions = board->flip_bitboard(board->get_all_piece_positions(!white));
+  bitboard other_piece_positions = board->get_all_piece_positions(!white) & ~position;
+  bitboard opponent_piece_positions = board->flip_bitboard(board->get_all_piece_positions(white));
   
   bitboard bishop_attackers = generate_bishop_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(BISHOP, white));
   bitboard rook_attackers = generate_rook_move_table(position, other_piece_positions, opponent_piece_positions) & board->flip_bitboard(board->get_piece_positions(ROOK, white));
@@ -212,7 +245,8 @@ std::array<bitboard, 6> MoveGenerator::get_attackers_to_position_by_piece(Board 
 // Check:
 bool MoveGenerator::is_checked(Board* board, bool white) {
   bitboard king_position = board->get_piece_positions(KING, white);
-  return get_attackers_to_position(board, king_position, !white);
+  bitboard king_attackers = get_attackers_to_position(board, king_position, !white);
+  return king_attackers;
 }
 
 // Print:

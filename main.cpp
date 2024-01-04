@@ -38,19 +38,23 @@ int main(void) {
   //Game game;
   //std::cout << game.is_checked(true) << "\n";
 
+  //std::array<int, 2> row_and_col = get_row_col_from_position(1);
+  //std::cout << "row " << row_and_col[0] << " col " << row_and_col[1] << "\n";
+
   Board board(true);
-  board.set_piece_position(1, KING, true);
+  board.set_piece_position(0x100, KING, true);
   board.set_piece_position(1, QUEEN, false);
-  board.set_piece_position(0x80, QUEEN, true);
-  board.set_piece_position(0x8000000000000000, QUEEN, true);
   board.print_board();
-  
+
   MoveGenerator move_gen;
-  //bitboard attackers = move_gen.get_attackers_to_position(&board, 1, false);
-  //print_bitboard(attackers);
 
   //move_gen.generate_evasion_moves(&board, true);
-  move_gen.generate_evasion_moves(&board, true);
+  //move_gen.generate_evasion_moves(&board, true);
+
+  std::vector<Move> legal_moves = move_gen.generate_legal_moves(&board, true);
+  for(int i = 0; i < legal_moves.size(); i++) {
+    legal_moves[i].print_move();
+  }
 
 
   return 0;

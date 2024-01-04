@@ -8,6 +8,10 @@ class MoveGenerator {
 public:
   MoveGenerator();
 
+  // Legal moves:
+  bool is_move_legal(Move* move, Board* board);
+  std::vector<Move> generate_legal_moves(Board* board, bool white); // TODO
+
   // Pseudo-legal move generation:
   std::vector<Move> generate_king_pseudo_legal_moves(Board* board, bool white);
   std::vector<Move> generate_queen_pseudo_legal_moves(Board* board, bool white); // TODO
@@ -18,15 +22,13 @@ public:
 
   // King Moves:
   std::vector<Move> generate_castle_moves(); // TODO
-  std::vector<Move> generate_evasion_moves(Board* board, bool white); // TODO
+  std::vector<Move> generate_evasion_moves(Board* board, bool white); // IN PROGRESS
 
-  // Legal moves:
-  std::vector<Move> generate_legal_moves(); // TODO
+  
 
   // Sliding Piece Moves
   bitboard generate_sliding_piece_move_table(direction slide_direction, bitboard piece_position, bitboard other_piece_positions, bitboard opponent_piece_positions);
   
-
   // Move tables:
   bitboard generate_king_move_table(bitboard king_position, bitboard other_piece_positions);
   bitboard generate_pawn_move_table(bitboard pawn_position, bitboard other_piece_positions, bitboard opponent_piece_positions);
