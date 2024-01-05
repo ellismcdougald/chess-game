@@ -9,8 +9,8 @@ public:
 
   // Game logic:
   void run_game(void);
-  void do_turn(void);
-  Move query_legal_move(void);
+  bool do_turn(void);
+  Move query_legal_move(std::vector<Move> legal_moves);
 
   // Printers:
   void print_board(void);

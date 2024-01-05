@@ -13,17 +13,27 @@ Game::Game() : board(false) {
 
 // Game Logic:
 void Game::run_game(void) {
-  while(true) {
-    do_turn();
-    // TODO: break for checkmate or stalemate
+  bool game_active = true;
+  while(game_active) {
+    game_active = do_turn();
   }
 }
 
-void Game::do_turn(void) {
+bool Game::do_turn(void) {
   std::cout << (white_turn ? "White" : "Black") << ": It is your turn.\n";
   board.print_board();
 
-  Move move = query_legal_move();
+  std::vector<Move> legal_moves = move_generator.generate_legal_moves(&board, white_turn);
+  if(legal_moves.size() == 0) {
+    if(move_generator.is_checked(&board, white_turn)) {
+      std::cout << "\nCheckmate! " << (white_turn ? "Black" : "White") << " wins!\n";
+    } else {
+      std::cout << "Stalemate! It's a tie.\n";
+    }
+    return false;
+  }
+
+  Move move = query_legal_move(legal_moves);
 
   update_castle_permissions(&move);
   
@@ -32,9 +42,11 @@ void Game::do_turn(void) {
   board.print_board();
 
   white_turn = !white_turn;
+
+  return true;
 }
 
-Move Game::query_legal_move(void) {
+Move Game::query_legal_move(std::vector<Move> legal_moves) {
   bool move_is_legal = false;
   while(!move_is_legal) {
     char start_row, start_col, end_row, end_col;
@@ -56,13 +68,7 @@ Move Game::query_legal_move(void) {
     
     Move move(white_turn, start_position, end_position, move_piece, capture_piece, castle);
 
-    std::vector<Move> legal_moves = move_generator.generate_legal_moves(&board, white_turn);
-    for(int i = 0; i < legal_moves.size(); i++) {
-      legal_moves[i].print_move();
-    }
-
     move_is_legal = is_move_legal(legal_moves, &move);
-    move_is_legal = true;
     if(!move_is_legal) {
       std::cout << "Illegal move. Try again.\n";
     } else {
