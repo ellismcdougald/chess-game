@@ -23,10 +23,8 @@ public:
   std::vector<Move> generate_pawn_pseudo_legal_moves(Board* board, bool white); // TODO
 
   // King Moves:
-  std::vector<Move> generate_castle_moves(); // TODO
+  std::vector<Move> generate_castle_moves(Board *board, bool white); // TODO
   std::vector<Move> generate_evasion_moves(Board* board, bool white); // IN PROGRESS
-
-  
 
   // Sliding Piece Moves
   bitboard generate_sliding_piece_move_table(direction slide_direction, bitboard piece_position, bitboard other_piece_positions, bitboard opponent_piece_positions);
@@ -49,9 +47,17 @@ public:
   // Check:
   bool is_checked(Board* board, bool white);
 
+  // Setters:
+  void set_white_can_castle_left(bool new_white_can_castle_left);
+  void set_white_can_castle_right(bool new_white_can_castle_right);
+  void set_black_can_castle_left(bool new_black_can_castle_left);
+  void set_black_can_castle_right(bool new_black_can_castle_right);
+
 private:
   LookupTables lookup_tables;
-
+  bool white_can_castle[2]; // first bool is can castle left, second bool is can castle right
+  bool black_can_castle[2];
+  
   // Print:
   void print_bitboard(bitboard bb);
 

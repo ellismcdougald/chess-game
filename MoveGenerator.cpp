@@ -6,7 +6,12 @@
 
 #include"MoveGenerator.hpp"
 
-MoveGenerator::MoveGenerator() {};
+MoveGenerator::MoveGenerator() {
+  white_can_castle[0] = true;
+  white_can_castle[1] = true;
+  black_can_castle[0] = true;
+  black_can_castle[1] = true;
+};
 
 // Legal moves:
 bool MoveGenerator::is_move_legal(Move* move, Board* board) {
@@ -16,7 +21,6 @@ bool MoveGenerator::is_move_legal(Move* move, Board* board) {
   board->execute_move(move);
   bool is_check = is_checked(board, move->get_white());
   board->undo_move(move);
-
   return !is_check;
 }
 
@@ -36,6 +40,11 @@ std::vector<Move> MoveGenerator::generate_legal_moves(Board* board, bool white) 
 	legal_moves.push_back(piece_pseudo_legal_moves[piece_index][i]);
       }
     }
+  }
+
+  std::vector<Move> castle_moves = generate_castle_moves(board, white);
+  for(int i = 0; i < castle_moves.size(); i++) {
+    legal_moves.push_back(castle_moves[i]);
   }
 		
   return legal_moves;
@@ -78,7 +87,7 @@ std::vector<Move> MoveGenerator::generate_piece_pseudo_legal_moves(Board* board,
       move_table = get_move_table_by_piece(move_piece, piece_position_mask, other_piece_positions, opponent_piece_positions);
       for(bitboard move_mask = 1; move_mask > 0; move_mask <<= 1) {
 	if(move_table & move_mask) {
-	  capture_piece = board->get_piece_at_position(move_mask, !white);
+	  capture_piece = board->get_piece_at_position(board->flip_bitboard(move_mask), !white);
 	  Move move(white, piece_position_mask, move_mask, move_piece, capture_piece, false);
 	  piece_pseudo_legal_moves.push_back(move);
 	}
@@ -90,6 +99,43 @@ std::vector<Move> MoveGenerator::generate_piece_pseudo_legal_moves(Board* board,
 }
 
 // King Moves:
+std::vector<Move> MoveGenerator::generate_castle_moves(Board* board, bool white) {
+  std::vector<Move> castle_moves;
+  bitboard king_position = board->get_piece_positions(KING, white);
+  bool king_in_place = king_position & 8;
+  if(!king_in_place) return castle_moves;
+  
+  bitboard other_piece_positions = board->get_all_piece_positions(white);
+  bitboard threatened_positions = board->flip_bitboard(generate_threat_table(board, !white, false));
+  bitboard king_side_between_positions = 0x6;
+  bitboard queen_side_between_positions = 0x70;
+
+  bitboard rook_positions = board->get_piece_positions(ROOK, white);
+  bool king_side_rook_in_place = rook_positions & (bitboard) 1;
+  bool queen_side_rook_in_place = rook_positions & (bitboard) 0x80;
+
+  bool can_castle_king_side, can_castle_queen_side;
+  if(white) {
+    can_castle_king_side = white_can_castle[0];
+    can_castle_queen_side = white_can_castle[1];
+  } else {
+    can_castle_king_side = black_can_castle[0];
+    can_castle_queen_side = black_can_castle[1];
+  }
+
+  if(king_side_rook_in_place && can_castle_king_side && !(king_side_between_positions & threatened_positions) && !(king_side_between_positions & other_piece_positions)) {
+    Move king_side_castle_move = Move(white, 0x8, 1, KING, NONE, true);
+    castle_moves.push_back(king_side_castle_move);
+  }
+
+  if(queen_side_rook_in_place && can_castle_queen_side && !(queen_side_between_positions & threatened_positions) && !(queen_side_between_positions & other_piece_positions)) {
+    Move queen_side_castle_move = Move(white, 0x8, 0x80, KING, NONE, true);
+    castle_moves.push_back(queen_side_castle_move);
+  }
+
+  return castle_moves;
+}
+
 // IN PROGRESS
 std::vector<Move> MoveGenerator::generate_evasion_moves(Board* board, bool white) {
   std::vector<Move> evasion_moves;
@@ -102,7 +148,6 @@ std::vector<Move> MoveGenerator::generate_evasion_moves(Board* board, bool white
 
   // king moves
   bitboard king_moves = lookup_tables.get_king_move_bitboard(king_position) & ~threatened_squares;
-  print_bitboard(king_moves);
 
   bitboard other_piece_positions = board->get_all_piece_positions(white);
   bitboard opponent_piece_positions = board->get_all_piece_positions(!white);
@@ -318,4 +363,23 @@ int MoveGenerator::count_bits(bitboard bb) {
     }
   }
   return bit_count;
+}
+
+// Setters:
+void MoveGenerator::set_white_can_castle_left(bool new_white_can_castle_left) {
+  white_can_castle[0] = new_white_can_castle_left;
+}
+
+void MoveGenerator::set_white_can_castle_right(bool new_white_can_castle_right) {
+  white_can_castle[1] = new_white_can_castle_right;
+}
+
+
+void MoveGenerator::set_black_can_castle_left(bool new_black_can_castle_left) {
+  black_can_castle[0] = new_black_can_castle_left;
+}
+
+
+void MoveGenerator::set_black_can_castle_right(bool new_black_can_castle_right) {
+  black_can_castle[1] = new_black_can_castle_right;
 }
