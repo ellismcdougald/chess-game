@@ -97,31 +97,67 @@ void Board::clear_piece_position(bitboard position, piece piece, bool white) {
 
 // Moves:
 void Board::execute_move(Move *move) {
-  clear_piece_position(move->get_start_position(),
+  if(move->is_castle()) {
+    clear_piece_position(move->get_start_position(),
+			 KING,
+			 move->get_white());
+    clear_piece_position(move->get_end_position(),
+			 ROOK,
+			 move->get_white());
+    bitboard new_king_position = move->get_end_position() == (bitboard) 1 ? 2 : 0x20;
+    set_piece_position(new_king_position,
+			 KING,
+			 move->get_white());
+    bitboard new_rook_position = move->get_end_position() == (bitboard) 1 ? 4 : 0x10;
+    set_piece_position(new_rook_position,
+			 ROOK,
+			 move->get_white());
+  } else {
+    clear_piece_position(move->get_start_position(),
 		       move->get_move_piece(),
 		       move->get_white());
-  set_piece_position(move->get_end_position(),
+    set_piece_position(move->get_end_position(),
 		     move->get_move_piece(),
 		     move->get_white());
-  if(move->get_capture_piece() != NONE) {
-    clear_piece_position(move->get_start_position(),
-		       move->get_capture_piece(),
-		       ~move->get_white());
+    if(move->get_capture_piece() != NONE) {
+      clear_piece_position(move->get_start_position(),
+			   move->get_capture_piece(),
+			   ~move->get_white());
+    }
   }
   
 }
 
 void Board::undo_move(Move *move) {
-  set_piece_position(move->get_start_position(),
+  if(move->is_castle()) {
+    set_piece_position(move->get_start_position(),
+			 KING,
+			 move->get_white());
+    set_piece_position(move->get_end_position(),
+			 ROOK,
+			 move->get_white());
+    bitboard new_king_position = move->get_end_position() == (bitboard) 1 ? 2 : 0x20;
+    clear_piece_position(new_king_position,
+			 KING,
+			 move->get_white());
+    bitboard new_rook_position = move->get_end_position() == (bitboard) 1 ? 4 : 0x10;
+    clear_piece_position(new_rook_position,
+			 ROOK,
+			 move->get_white());
+  } else {
+    set_piece_position(move->get_start_position(),
 		       move->get_move_piece(),
 		       move->get_white());
-  clear_piece_position(move->get_end_position(),
+    
+    clear_piece_position(move->get_end_position(),
 		     move->get_move_piece(),
 		     move->get_white());
-  if(move->get_capture_piece() != NONE) {
-    set_piece_position(move->get_start_position(),
-		       move->get_capture_piece(),
-		       ~move->get_white());
+    
+    if(move->get_capture_piece() != NONE) {
+      set_piece_position(move->get_start_position(),
+			   move->get_capture_piece(),
+			   ~move->get_white());
+    }
   }
 }
 
