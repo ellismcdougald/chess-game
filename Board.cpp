@@ -45,10 +45,10 @@ piece Board::get_piece_at_position(bitboard position, bool white) {
 
 // Printers:
 void Board::print_board(void) {
-  std::cout << "Board:\n";
   bitboard mask = (bitboard) 1 << 63;
   piece white_piece, black_piece;
-  
+
+  std::cout << 8 << " ";
   for(int i = 0; i < 64; i++) {
     white_piece = get_piece_at_position(mask, true);
     black_piece = get_piece_at_position(flip_bitboard(mask), false);
@@ -65,10 +65,25 @@ void Board::print_board(void) {
 
     if((i + 1) % 8 == 0) {
       std::cout << "\n";
+      std::cout << "  ";
+      for(int j = 0; j < 31; j++) {
+	std::cout << "-";
+      }
+      std::cout << "\n";
+
+      if(((i + 1) / 8) < 8) {
+	std::cout << 8 - ((i + 1) / 8) << " ";
+      }
     } else {
       std::cout << "|";
     }
   }
+
+  std::cout << "  ";
+  for(char letter = 'A'; letter <= 'H'; letter++) {
+    std::cout << " " << letter << "  ";
+  }
+  std::cout << "\n";
 }
 
 void Board::print_piece_positions(piece p, bool white) {
