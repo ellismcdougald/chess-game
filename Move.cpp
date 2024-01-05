@@ -47,6 +47,8 @@ void Move::print_move(void) {
   std::array<int, 2> end_row_col = get_row_col_from_position(end_position);
 
   std::cout << (char) (start_row_col[1] + 65 - 1) << start_row_col[0] << "->" << (char) (end_row_col[1] + 65 - 1) << end_row_col[0] << "\n";
+
+  std::cout << move_piece << " -> " << capture_piece << "\n";
 }
 
 // Helpers:
