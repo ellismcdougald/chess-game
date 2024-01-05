@@ -16,6 +16,7 @@ void Game::run_game(void) {
   bool game_active = true;
   while(game_active) {
     game_active = do_turn();
+    std::cout << "\n";
   }
 }
 
@@ -38,8 +39,6 @@ bool Game::do_turn(void) {
   update_castle_permissions(&move);
   
   board.execute_move(&move);
-
-  board.print_board();
 
   white_turn = !white_turn;
 
