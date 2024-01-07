@@ -124,7 +124,6 @@ Checkmate! Black wins!
 ### Improvements:
 
 - Implement en passant moves
-- Implement pawn promotion
 - Fully test move generation
 - Add Universal Chess Interface support
 
