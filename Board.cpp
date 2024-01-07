@@ -171,7 +171,7 @@ void Board::undo_move(Move *move) {
     if(move->get_capture_piece() != NONE) {
       set_piece_position(move->get_start_position(),
 			   move->get_capture_piece(),
-			   ~move->get_white());
+			 !move->get_white());
     }
   }
 }
