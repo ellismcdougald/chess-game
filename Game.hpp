@@ -11,6 +11,7 @@ public:
   void run_game(void);
   bool do_turn(void);
   Move query_legal_move(std::vector<Move> legal_moves);
+  void handle_pawn_promotion(Move* move);
 
   // Printers:
   void print_board(void);
@@ -21,7 +22,7 @@ public:
   // Getters
   Board* get_board_ptr(void);
   MoveGenerator* get_move_generator_ptr(void);
-
+  
 private:
   Board board;
   bool white_turn;
@@ -32,5 +33,6 @@ private:
   void print_bitboard(bitboard bb);
   bool is_move_legal(std::vector<Move> legal_moves, Move* move);
   void update_castle_permissions(Move *move);
+  piece get_piece_type_from_piece_str(std::string piece_str);
 };
   

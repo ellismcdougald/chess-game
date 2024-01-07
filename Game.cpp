@@ -40,6 +40,8 @@ bool Game::do_turn(void) {
   
   board.execute_move(&move);
 
+  handle_pawn_promotion(&move);
+
   white_turn = !white_turn;
 
   return true;
@@ -76,6 +78,37 @@ Move Game::query_legal_move(std::vector<Move> legal_moves) {
   }
   
   return Move(0, 0, 0, NONE, NONE, 0);
+}
+
+void Game::handle_pawn_promotion(Move *move) {
+  std::string piece_str;
+  piece piece_type = NONE;
+  if(move->get_move_piece() == PAWN && move->get_end_position() & 0xFF00000000000000) {
+    while(piece_type == NONE) {
+      std::cout << "What piece would you like to promote your pawn to? (i.e. Queen): ";
+      std::cin >> piece_str;
+      piece_type = get_piece_type_from_piece_str(piece_str);
+    }
+  }
+
+  bitboard end_position = move->get_end_position();
+  bool white = move->get_white();
+  board.clear_piece_position(end_position, PAWN, white);
+  board.set_piece_position(end_position, piece_type, white);
+}
+
+piece Game::get_piece_type_from_piece_str(std::string piece_str) {
+  for(int i = 0; i < piece_str.length(); i++) {
+    piece_str[i] = tolower(piece_str[i]);
+  }
+
+  if(piece_str == "king") return KING;
+  else if(piece_str == "queen") return QUEEN;
+  else if(piece_str == "rook") return ROOK;
+  else if(piece_str == "bishop") return BISHOP;
+  else if(piece_str == "knight") return KNIGHT;
+  else if(piece_str == "pawn") return PAWN;
+  else return NONE;
 }
 
 // Printers:
